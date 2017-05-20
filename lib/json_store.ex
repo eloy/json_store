@@ -19,16 +19,21 @@ defmodule JsonStore do
     end
   end
 
-  def save(module, record) do
+  def save(module, record, opt \\ %{}) do
     table = table_name(module)
     {:ok, json} = to_json(module, record)
-    case send_query "INSERT INTO #{table} JSON :json;", %{json: json} do
+
+    ttl_clause_sql = ttl_clause(opt)
+    sql = "INSERT INTO #{table} JSON :json #{ttl_clause_sql}"
+    params = %{json: json}
+
+    case send_query sql, params do
       {:ok, _} -> :ok
       other -> other
     end
   end
 
-  def update(module, record, changes) do
+  def update(module, record, changes, opt \\ %{}) do
     table = table_name(module)
 
     # Where part
@@ -49,9 +54,18 @@ defmodule JsonStore do
 
     set_clauses_sql = Enum.join(set_clauses, ",")
 
+    ttl_clause_sql = ttl_clause(opt)
+    sql = "UPDATE #{table} #{ttl_clause_sql} SET #{set_clauses_sql} where #{where_clauses_sql}"
 
-    sql = "UPDATE #{table} SET #{set_clauses_sql} where #{where_clauses_sql}"
-    send_query(sql, params)
+    IO.puts "\"#{sql}\" => #{inspect(params)}"
+    IO.puts inspect(send_query(sql, params))
+  end
+
+  defp ttl_clause(opt) do
+    case opt[:ttl] do
+      nil -> ""
+      ttl -> "USING TTL #{ttl}"
+    end
   end
 
   def select(module, fields, clause, params \\ %{}) do

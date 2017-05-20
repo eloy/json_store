@@ -17,7 +17,7 @@ defmodule JsonStoreTest do
     test "valid change" do
       model = %TestModel{id: "a", foo: "bar"}
       change = %{bar: 2}
-      TestModel.update(model, change)
+      TestModel.update(model, change, ttl: 40)
     end
   end
 end
