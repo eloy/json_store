@@ -3,6 +3,7 @@ defmodule JsonStore.Model do
     quote do
       import Extruder
       @__extruder__ %{validations: [], fields: []}
+      def all(), do: JsonStore.all(__MODULE__)
       def find(params), do: JsonStore.find(__MODULE__, params)
       def save(record, opt \\ %{}), do: JsonStore.save(__MODULE__, record, opt)
       def destroy(record), do: JsonStore.destroy(__MODULE__, record)

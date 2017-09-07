@@ -57,8 +57,6 @@ defmodule JsonStore do
     ttl_clause_sql = ttl_clause(opt)
     sql = "UPDATE #{table} #{ttl_clause_sql} SET #{set_clauses_sql} where #{where_clauses_sql}"
 
-    IO.puts "\"#{sql}\" => #{inspect(params)}"
-    IO.puts inspect(send_query(sql, params))
   end
 
   defp ttl_clause(opt) do
@@ -66,6 +64,12 @@ defmodule JsonStore do
       nil -> ""
       ttl -> "USING TTL #{ttl}"
     end
+  end
+
+  def all(module) do
+    table = table_name(module)
+    sql = "SELECT JSON * FROM #{table}"
+    query_and_parse(module, sql)
   end
 
   def select(module, fields, clause, params \\ %{}) do
@@ -92,7 +96,7 @@ defmodule JsonStore do
     query_and_parse(module, sql, params)
   end
 
-  defp query_and_parse(module, sql, params) do
+  defp query_and_parse(module, sql, params \\ %{}) do
     case send_query sql, params do
       {:ok, res} ->
         records = Enum.map res, fn(["[json]": json]) ->
