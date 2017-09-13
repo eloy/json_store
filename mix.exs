@@ -31,7 +31,8 @@ defmodule JsonStore.Mixfile do
       {:extruder, github: "eloy/extruder"},
       {:cqex, github: "matehat/cqex"},
       {:inflex, "~> 1.7.0" },
-      {:poison, "~> 2.2"}
+      {:poison, "~> 2.2"},
+      {:pooler, "~> 1.5.2", override: true}
     ]
   end
 end
