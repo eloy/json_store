@@ -57,6 +57,11 @@ defmodule JsonStore do
     ttl_clause_sql = ttl_clause(opt)
     sql = "UPDATE #{table} #{ttl_clause_sql} SET #{set_clauses_sql} where #{where_clauses_sql}"
 
+    case send_query(sql, params) do
+      {:ok, _} -> :ok
+      other -> other
+    end
+
   end
 
   defp ttl_clause(opt) do
